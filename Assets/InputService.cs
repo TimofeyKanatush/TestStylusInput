@@ -1,26 +1,82 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using TouchPhase = UnityEngine.TouchPhase;
 
 public class InputService : MonoBehaviour
 {
     [SerializeField] private UnityEvent StylusClicked;
     [SerializeField] private UnityEvent MouseClicked;
     [SerializeField] private UnityEvent SingleTouchTapped;
+    [SerializeField] private Button _button;
+    [SerializeField] private TMP_Text _buttonText;
 
-    private int _distanceForMove = 10;
+    public bool IsNewInputSystem;
+
+    private const string NEW_INPUT_SYSTEM = "New Input System:";
+    private const int DISTANCE_FOR_MOVE = 10;
     private bool _isOneTouchClicked;
+
+    private void Awake()
+    {
+        UpdateButtonText();
+
+        _button.onClick.AddListener(() =>
+        {
+            IsNewInputSystem = !IsNewInputSystem;
+            UpdateButtonText();
+        });
+    }
+
+    private void UpdateButtonText()
+    {
+        string status = IsNewInputSystem ? "on" : "off";
+        _buttonText.text = $"{NEW_INPUT_SYSTEM} {status}";
+    }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && Input.touchCount == 0)
+        if (IsNewInputSystem)
         {
-            HandleMouseClick();
+            if (Pen.current != null)
+            {
+                if (Pen.current.tip.isPressed)
+                {
+                    Debug.Log("New Input System: tip");
+                    HandleMouseClick();
+                
+                }
+                else if(Pen.current.press.isPressed)
+                {
+                    Debug.Log("New Input System: press");
+                    HandleMouseClick();
+                }
+            }
+            else
+            {
+                Debug.LogWarning("New Input System: Stylus not available");
+            }
+
+            if (Pointer.current.press.isPressed)
+            {
+                Debug.Log("New Input System: Pointer is pressed");
+            }
         }
-        else if (Input.touchCount > 0)
+        else
         {
-            HandleTouch();
+            if (Input.GetMouseButtonDown(0) && Input.touchCount == 0)
+            {
+                Debug.Log("Stylus clicked");
+                HandleMouseClick();
+            }
+            else if (Input.touchCount > 0)
+            {
+                Debug.Log("Touch tapped");
+                HandleTouch();
+            }
         }
     }
 
@@ -45,7 +101,7 @@ public class InputService : MonoBehaviour
             _isOneTouchClicked = true;
         }
 
-        bool isThresholdPassed = touch.deltaPosition.sqrMagnitude > _distanceForMove * _distanceForMove;
+        bool isThresholdPassed = touch.deltaPosition.sqrMagnitude > DISTANCE_FOR_MOVE * DISTANCE_FOR_MOVE;
         if (touch.phase == TouchPhase.Moved && isThresholdPassed)
         {
             _isOneTouchClicked = false;

@@ -10,7 +10,7 @@ public class InputHandler : MonoBehaviour
     [SerializeField] private Camera _camera;
     [SerializeField] private TMP_Text _stylusAvailableText;
     [SerializeField] private TMP_Text _stylusUsedText;
-    
+
     [Space]
     [SerializeField] private Color _color;
 
@@ -21,8 +21,12 @@ public class InputHandler : MonoBehaviour
     private void Start()
     {
         _originalColor = _camera.backgroundColor;
-        _stylusAvailableText.text = $"{STYLUS_AVAILABLE} {Input.stylusTouchSupported}";
         _stylusUsedText.text = $"{STYLUS_USED} {false}";
+    }
+
+    private void Update()
+    {
+        _stylusAvailableText.text = $"{STYLUS_AVAILABLE} {Input.stylusTouchSupported}";
     }
 
     public void OnStylusUsed()
