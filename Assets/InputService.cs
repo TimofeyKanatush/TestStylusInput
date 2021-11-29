@@ -45,7 +45,7 @@ public class InputService : MonoBehaviour
             {
                 if (Pen.current.tip.isPressed)
                 {
-                    Debug.Log("New Input System: tip");
+                    Debug.Log("New Input System: Pen is pressed");
                     HandleMouseClick();
                 
                 }
